@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">armorycompanion</string>
+    <string name="scan_signed_tx">Scan Signed Transaction</string>
+    <string name="number_of_peers">Number of peers</string>
+</resources>

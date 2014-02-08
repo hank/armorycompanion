@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+        >
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_of_peers"/>
+        <TextView android:layout_width="0px"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:id="@+id/numPeers"/>
+    </LinearLayout>
+    <ListView android:id="@+id/peerList"
+              android:layout_width="wrap_content"
+              android:layout_height="0px"
+              android:layout_weight="1"/>
+    <Button android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:id="@+id/scanButton"
+            android:text="@string/scan_signed_tx"/>
+</LinearLayout>
+
