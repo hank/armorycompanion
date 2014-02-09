@@ -1,3 +1,6 @@
+.idea
+out
+target
 *.properties
 proguard-project.txt
 build.xml
