@@ -51,8 +51,10 @@ public class PeerListAdapter extends BaseAdapter {
         Log.i("Adapter", "In getView, position " + position);
         Peer peer = values.get(position);
 
-        TextView textView = (TextView) convertView.findViewById(R.id.peerName);
-        textView.setText(peer.getPeerVersionMessage().toString());
+        TextView peerName = (TextView) convertView.findViewById(R.id.peerName);
+        TextView peerAddress = (TextView) convertView.findViewById(R.id.peerAddress);
+        peerName.setText(peer.getPeerVersionMessage().subVer);
+        peerAddress.setText(peer.getPeerVersionMessage().theirAddr.toString());
         return convertView;
     }
 }

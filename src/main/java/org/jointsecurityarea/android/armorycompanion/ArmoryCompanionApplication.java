@@ -48,4 +48,8 @@ public class ArmoryCompanionApplication extends Application {
     {
         // Custom application method
     }
+
+    public void exit() {
+        peerGroup.stop();
+    }
 }

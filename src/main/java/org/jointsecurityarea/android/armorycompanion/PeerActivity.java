@@ -1,6 +1,7 @@
 package org.jointsecurityarea.android.armorycompanion;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
@@ -14,6 +15,7 @@ import com.google.bitcoin.core.GetDataMessage;
 import com.google.bitcoin.core.Message;
 import com.google.bitcoin.core.Peer;
 import com.google.bitcoin.core.PeerEventListener;
+import com.google.bitcoin.core.PeerGroup;
 import com.google.bitcoin.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import java.util.List;
 
 public class PeerActivity extends Activity {
     private static final Logger logger = LoggerFactory.getLogger(PeerActivity.class);
-    private int peersConnected = 0;
     ArmoryCompanionApplication application;
 
     /**
@@ -44,6 +45,25 @@ public class PeerActivity extends Activity {
                 handleScan();
             }
         });
+        Button exitbutton = (Button)findViewById(R.id.exitButton);
+        exitbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                application.exit();
+                moveTaskToBack(true);
+            }
+        });
+        Button helpbutton = (Button)findViewById(R.id.helpButton);
+        helpbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(PeerActivity.this)
+                        .setMessage(R.string.helpText)
+                        .setTitle("Help")
+                        .setNeutralButton(android.R.string.ok, null)
+                        .create().show();
+            }
+        });
         application.getPeerGroup().addEventListener(new PeerActivityEventListener());
     }
 
@@ -57,14 +77,16 @@ public class PeerActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView peersConnectedView = (TextView)findViewById(R.id.numPeers);
-                peersConnectedView.setText(Integer.toString(peersConnected));
+                Button broadcastTransactionButton = (Button)findViewById(R.id.scanButton);
                 ListView peerListView = (ListView)findViewById(R.id.peerList);
                 List<Peer> connectedPeers = application.getPeerGroup().getConnectedPeers();
-                for(Peer p : connectedPeers) {
-                    Log.i("Peering", "Peer: " + p.toString());
-                }
                 application.getPeerListAdapter().replace(connectedPeers);
+                // Enable button if we're sufficiently connected
+                if(application.getPeerGroup().numConnectedPeers() >= 3) {
+                    broadcastTransactionButton.setEnabled(true);
+                } else {
+                    broadcastTransactionButton.setEnabled(false);
+                }
             }
         });
     }
@@ -80,8 +102,8 @@ public class PeerActivity extends Activity {
         String input = null;
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         input = scanResult.getContents();
-        Log.i("ScanResult", "Got " + input.length() + ": " + input);
         if(input != null) {
+            Log.i("ScanResult", "Got " + input.length() + ": " + input);
             byte[] convertedScan = Base64.decode(input, Base64.DEFAULT);
             Intent txIntent = new Intent(this, TransactionBroadcastActivity.class);
             txIntent.putExtra("scanResult", convertedScan);
@@ -91,18 +113,12 @@ public class PeerActivity extends Activity {
     class PeerActivityEventListener implements PeerEventListener {
         @Override
         public void onPeerConnected(Peer peer, int peerCount) {
-            synchronized (this) {
-                peersConnected += 1;
-                redraw();
-            }
+            redraw();
         }
 
         @Override
         public void onPeerDisconnected(Peer peer, int peerCount) {
-            synchronized (this) {
-                peersConnected -= 1;
-                redraw();
-            }
+            redraw();
         }
 
         @Override

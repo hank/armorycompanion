@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">armorycompanion</string>
+    <string name="app_name">Armory Companion</string>
     <string name="scan_signed_tx">Scan Signed Transaction</string>
     <string name="number_of_peers">Number of peers</string>
+    <string name="exit">Exit</string>
+    <string name="help">Help</string>
+    <string name="helpText">This app will broadcast signed transactions from an offline instance of armory. See the
+        video here (placeholder) for a demonstration. There are other utilities available on [insert github link] that
+        can be used with the offline instance.\n\nThe reason behind this app is to remove the necessity of using USB
+        drives to move unsigned transactions to offline wallets and to move signed transactions back online. This way,
+        one can scan the offline transaction with their offline wallet webcam, sign it, then scan the output with their
+        phone to broadcast it on the bitcoin network.
+    </string>
+    <string name="peers">Peers</string>
 </resources>

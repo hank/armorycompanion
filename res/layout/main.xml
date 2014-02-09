@@ -2,22 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        >
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-        <TextView
-                android:layout_width="0px"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/number_of_peers"/>
-        <TextView android:layout_width="0px"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:id="@+id/numPeers"/>
-    </LinearLayout>
+              android:layout_height="fill_parent">
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/peers" android:textSize="22dp"/>
     <ListView android:id="@+id/peerList"
               android:layout_width="wrap_content"
               android:layout_height="0px"
@@ -25,6 +13,15 @@
     <Button android:layout_width="fill_parent"
             android:layout_height="60dp"
             android:id="@+id/scanButton"
-            android:text="@string/scan_signed_tx"/>
+            android:text="@string/scan_signed_tx"
+            android:enabled="false" />
+    <Button android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:id="@+id/helpButton"
+            android:text="@string/help" />
+    <Button android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:id="@+id/exitButton"
+            android:text="@string/exit" />
 </LinearLayout>
 
