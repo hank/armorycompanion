@@ -3,6 +3,7 @@ package org.jointsecurityarea.android.armorycompanion;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,20 +14,18 @@ import com.google.bitcoin.core.GetDataMessage;
 import com.google.bitcoin.core.Message;
 import com.google.bitcoin.core.Peer;
 import com.google.bitcoin.core.PeerEventListener;
-import com.google.bitcoin.core.PeerGroup;
 import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.net.discovery.DnsDiscovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class MyActivity extends Activity {
-    private static final Logger logger = LoggerFactory.getLogger(MyActivity.class);
-    PeerGroup peerGroup;
-    int peersConnected = 0;
-    PeerListAdapter peerListAdapter;
+public class PeerActivity extends Activity {
+    private static final Logger logger = LoggerFactory.getLogger(PeerActivity.class);
+    private int peersConnected = 0;
+    ArmoryCompanionApplication application;
+
     /**
      * Called when the activity is first created.
      */
@@ -34,52 +33,9 @@ public class MyActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        peerGroup = new PeerGroup(Constants.NETWORK_PARAMETERS);
-        peerGroup.setMaxConnections(5);
-        peerGroup.setUserAgent("ArmoryCompanion Android", Constants.VERSION, "Relaying txs like a boss");
-        peerGroup.addEventListener(new PeerEventListener() {
-            @Override
-            public void onPeerConnected(Peer peer, int peerCount) {
-                peersConnected += 1;
-                redraw();
-            }
-
-            @Override
-            public void onPeerDisconnected(Peer peer, int peerCount) {
-                peersConnected -= 1;
-                redraw();
-            }
-
-            @Override
-            public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft) {
-            }
-
-            @Override
-            public void onChainDownloadStarted(Peer peer, int blocksLeft) {
-            }
-
-            @Override
-            public Message onPreMessageReceived(Peer peer, Message m) {
-                return null;
-            }
-
-            @Override
-            public void onTransaction(Peer peer, Transaction t) {
-            }
-
-            @Nullable
-            @Override
-            public List<Message> getData(Peer peer, GetDataMessage m) {
-                return null;
-            }
-        });
-        peerGroup.addPeerDiscovery(new DnsDiscovery(Constants.NETWORK_PARAMETERS));
-        peerGroup.start();
-        setContentView(R.layout.main);
+        this.application = (ArmoryCompanionApplication)getApplication();
         ListView peerListView = (ListView)findViewById(R.id.peerList);
-        List<Peer> connectedPeers = peerGroup.getConnectedPeers();
-        peerListAdapter = new PeerListAdapter(this, connectedPeers);
-        peerListView.setAdapter(peerListAdapter);
+        peerListView.setAdapter(application.getPeerListAdapter());
 
         Button button = (Button)findViewById(R.id.scanButton);
         button.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +44,7 @@ public class MyActivity extends Activity {
                 handleScan();
             }
         });
+        application.getPeerGroup().addEventListener(new PeerActivityEventListener());
     }
 
     @Override
@@ -103,11 +60,11 @@ public class MyActivity extends Activity {
                 TextView peersConnectedView = (TextView)findViewById(R.id.numPeers);
                 peersConnectedView.setText(Integer.toString(peersConnected));
                 ListView peerListView = (ListView)findViewById(R.id.peerList);
-                List<Peer> connectedPeers = peerGroup.getConnectedPeers();
+                List<Peer> connectedPeers = application.getPeerGroup().getConnectedPeers();
                 for(Peer p : connectedPeers) {
                     Log.i("Peering", "Peer: " + p.toString());
                 }
-                peerListAdapter.replace(connectedPeers);
+                application.getPeerListAdapter().replace(connectedPeers);
             }
         });
     }
@@ -123,11 +80,52 @@ public class MyActivity extends Activity {
         String input = null;
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         input = scanResult.getContents();
+        Log.i("ScanResult", "Got " + input.length() + ": " + input);
         if(input != null) {
+            byte[] convertedScan = Base64.decode(input, Base64.DEFAULT);
             Intent txIntent = new Intent(this, TransactionBroadcastActivity.class);
-            txIntent.putExtra("scanResult", input);
+            txIntent.putExtra("scanResult", convertedScan);
             startActivity(txIntent);
         }
     }
+    class PeerActivityEventListener implements PeerEventListener {
+        @Override
+        public void onPeerConnected(Peer peer, int peerCount) {
+            synchronized (this) {
+                peersConnected += 1;
+                redraw();
+            }
+        }
 
+        @Override
+        public void onPeerDisconnected(Peer peer, int peerCount) {
+            synchronized (this) {
+                peersConnected -= 1;
+                redraw();
+            }
+        }
+
+        @Override
+        public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft) {
+        }
+
+        @Override
+        public void onChainDownloadStarted(Peer peer, int blocksLeft) {
+        }
+
+        @Override
+        public Message onPreMessageReceived(Peer peer, Message m) {
+            return null;
+        }
+
+        @Override
+        public void onTransaction(Peer peer, Transaction t) {
+        }
+
+        @Nullable
+        @Override
+        public List<Message> getData(Peer peer, GetDataMessage m) {
+            return null;
+        }
+    }
 }

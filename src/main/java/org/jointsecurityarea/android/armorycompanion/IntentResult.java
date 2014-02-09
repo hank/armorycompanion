@@ -28,21 +28,24 @@ public final class IntentResult {
   private final byte[] rawBytes;
   private final Integer orientation;
   private final String errorCorrectionLevel;
+  private final byte[] dataBytes;
 
   IntentResult() {
-    this(null, null, null, null, null);
+    this(null, null, null, null, null, null);
   }
 
   IntentResult(String contents,
                String formatName,
                byte[] rawBytes,
                Integer orientation,
-               String errorCorrectionLevel) {
+               String errorCorrectionLevel,
+               byte[] dataBytes) {
     this.contents = contents;
     this.formatName = formatName;
     this.rawBytes = rawBytes;
     this.orientation = orientation;
     this.errorCorrectionLevel = errorCorrectionLevel;
+    this.dataBytes = dataBytes;
   }
 
   /**
@@ -65,6 +68,11 @@ public final class IntentResult {
   public byte[] getRawBytes() {
     return rawBytes;
   }
+
+  /**
+   * @return raw content of barcode in bytes
+   */
+  public byte [] getDataBytes() { return dataBytes; }
 
   /**
    * @return rotation of the image, in degrees, which resulted in a successful scan. May be null.

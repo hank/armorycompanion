@@ -5,6 +5,15 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <TextView android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
+              android:layout_height="0px"
+              android:layout_weight="1"
               android:id="@+id/tx"/>
+    <Button android:id="@+id/broadcastButton"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:text="Broadcast"/>
+    <Button android:id="@+id/cancelButton"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:text="Cancel"/>
 </LinearLayout>
